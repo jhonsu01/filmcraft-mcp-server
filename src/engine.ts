@@ -26,8 +26,8 @@ export function requireCli(): string {
   const install = resolveInstall();
   if (!install.cli) {
     throw new Error(
-      `filmcraft-cli.exe not found in ${install.dir}. Install FilmCraft (https://github.com/storytold/filmcraft) ` +
-        'or set FILMCRAFT_DIR to its install folder.',
+      `filmcraft-cli not found (looked in ${install.searched.slice(0, 6).join(', ')} and PATH). Install FilmCraft ` +
+        '(https://github.com/storytold/filmcraft/releases; on macOS also the filmcraft-cli zip) or set FILMCRAFT_DIR / FILMCRAFT_CLI.',
     );
   }
   return install.cli;

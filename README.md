@@ -3,11 +3,11 @@
 <h1 align="center">FilmCraft MCP Server</h1>
 
 <p align="center">
-  <b>English</b> · <a href="README.es.md">Español</a>
+  <b>English</b> · <a href="README.es.md">Español</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.fr.md">Français</a> · <a href="README.de.md">Deutsch</a> · <a href="README.ru.md">Русский</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ja.md">日本語</a> · <a href="README.ko.md">한국어</a>
 </p>
 
 <p align="center">
-  Let Claude edit video with the <b>FilmCraft</b> installed on your Windows PC —<br>
+  Let Claude edit video with the <b>FilmCraft</b> installed on your computer — <b>Windows, macOS and Linux</b>:<br>
   split, trim, effects, color looks, titles, speed, audio, transitions, export, and editable timelines.
 </p>
 
@@ -18,11 +18,24 @@
 [FilmCraft](https://github.com/storytold/filmcraft) is an open-source, Premiere-class video editor written in Rust. Every action in it is an engine command, and it ships a headless CLI (`filmcraft-cli`). This [Model Context Protocol](https://modelcontextprotocol.io) server turns that engine into **file-in / file-out tools** for Claude, so you can ask things like:
 
 > *"Split every video in `D:\clips` into 2-second pieces, one folder per video."*
-> *"Add a vignette, the Golden Dusk look and the title 'Day 1' at the bottom of `D:\trip\a.mp4`."*
+> *"Add a vignette, the Golden Dusk look and the title 'Day 1' at the bottom of `~/trip/a.mp4`."*
 > *"Join these three shots with a cross dissolve and export them for YouTube 1080p."*
 > *"Give me the edit as a FilmCraft project and as FCPXML for DaVinci."*
 
 Inspired by [audacity-mcp-server](https://github.com/jhonsu01/audacity-mcp-server).
+
+## Platforms
+
+| OS | FilmCraft package to install | Where the server finds it (no setup needed) | Status |
+| --- | --- | --- | --- |
+| **Windows** 10/11 (x64, x86) | MSI or portable zip | `C:\Program Files\FilmCraft`, `%LOCALAPPDATA%\Programs\FilmCraft`, `PATH` | ✅ Verified (Windows 11) |
+| **Linux** (x86_64, aarch64, glibc ≥ 2.35) | `.deb`, `.rpm` or `.tar.gz` | `/usr/bin`, `/usr/local/bin`, `/opt/filmcraft/bin`, `~/.local/bin`, `PATH` | ✅ Verified (Debian 12, headless, 21/21 e2e) |
+| **macOS** 11+ (Apple silicon and Intel) | `.dmg` (the app) **plus** `filmcraft-cli-<version>-macos-universal.zip` | `/Applications/FilmCraft.app`, `/usr/local/bin`, `/opt/homebrew/bin`, `~/.local/bin`, `~/bin`, `PATH` | 🟡 Supported, not yet tested on a Mac |
+
+All downloads: [FilmCraft releases](https://github.com/storytold/filmcraft/releases). Anywhere else: set `FILMCRAFT_DIR` (folder, `.tar.gz` root or `FilmCraft.app`) or `FILMCRAFT_CLI`.
+
+- **macOS:** the DMG contains only the app. Unzip the separate `filmcraft-cli` zip and move `filmcraft-cli` to `/usr/local/bin` (or point `FILMCRAFT_CLI` at it). If macOS blocks its first run, allow it in *System Settings → Privacy & Security*.
+- **Linux:** the AppImage and Flatpak contain only the app, not `filmcraft-cli`; use the deb, rpm or tar.gz. For an AppImage app, set `FILMCRAFT_APP` so `open_in_filmcraft` can start it. On a server without a GPU, the verified setup used `libxkbcommon0 libvulkan1 libegl1 mesa-vulkan-drivers libasound2`.
 
 ## How it works
 
@@ -46,7 +59,7 @@ Inspired by [audacity-mcp-server](https://github.com/jhonsu01/audacity-mcp-serve
 | `list_catalog` | Video/audio effects, transitions, Lumetri looks, export presets, engine commands |
 | `run_commands` | Any of the 666 engine commands, with `$items[0]` / `$steps[N].path` references |
 | `open_in_filmcraft` | Open projects or media in the FilmCraft app |
-| `get_filmcraft_status` | Install, version, app / control port, catalog sizes |
+| `get_filmcraft_status` | Platform, install, version, app / control port, catalog sizes |
 
 ## What you get
 
@@ -65,13 +78,13 @@ Inspired by [audacity-mcp-server](https://github.com/jhonsu01/audacity-mcp-serve
 
 ```json
 {
-  "input_path": "D:\\clips\\beach.mp4",
+  "input_path": "/home/me/clips/beach.mp4",
   "effects": [
     { "effect": "vignette", "params": { "amount": -60 } },
     { "effect": "motion", "keyframes": { "scale": [ { "seconds": 0, "value": 100 }, { "seconds": 3, "value": 115 } ] } }
   ],
   "color_preset": "Golden Dusk",
-  "texts": [ { "text": "Día 1", "placement": "bottom", "color": "#ffcc00", "stroke_color": "#000000", "size": 110 } ],
+  "texts": [ { "text": "Day 1", "placement": "bottom", "color": "#ffcc00", "stroke_color": "#000000", "size": 110 } ],
   "fade_in": 0.5,
   "preset": "Social Vertical 1080×1920",
   "save_project": true,
@@ -81,17 +94,16 @@ Inspired by [audacity-mcp-server](https://github.com/jhonsu01/audacity-mcp-serve
 
 ## Requirements
 
-- Windows 10/11 x64
-- **FilmCraft** (tested with **0.2.1**), with `filmcraft-cli.exe` in its install folder
+- **FilmCraft** with `filmcraft-cli` (tested with **0.2.1**) — see [Platforms](#platforms)
 - Node.js ≥ 20 (bundled with Claude Desktop for `.mcpb` installs)
 
 ## Installation
 
-### Claude Desktop (recommended)
+### Claude Desktop (recommended, all platforms)
 
 1. Download `filmcraft-mcp-server.mcpb` from the [latest release](https://github.com/jhonsu01/filmcraft-mcp-server/releases/latest).
 2. Double-click it (or drag it onto Claude Desktop → *Settings → Extensions*) and click **Install**.
-3. Optional: if FilmCraft is not in `C:\Program Files\FilmCraft`, set its folder in the extension settings.
+3. Optional: if FilmCraft is not in a standard place, set its folder or the `filmcraft-cli` path in the extension settings.
 
 ### Claude Code / other MCP clients
 
@@ -100,15 +112,27 @@ git clone https://github.com/jhonsu01/filmcraft-mcp-server.git
 cd filmcraft-mcp-server
 npm install
 npm run build
+```
+
+Windows:
+
+```bash
 claude mcp add filmcraft -- node "%CD%\dist\bundle.cjs"
+```
+
+macOS / Linux:
+
+```bash
+claude mcp add filmcraft -- node "$PWD/dist/bundle.cjs"
 ```
 
 ## Configuration
 
 | Variable | Meaning |
 | --- | --- |
-| `FILMCRAFT_DIR` | FilmCraft install folder (or one of its `.exe`). Default: `C:\Program Files\FilmCraft` |
-| `FILMCRAFT_CLI` | Path of `filmcraft-cli.exe` (overrides `FILMCRAFT_DIR`) |
+| `FILMCRAFT_DIR` | FilmCraft install folder, one of its executables, a `.tar.gz` root (with `bin/`) or `FilmCraft.app`. Default: auto-detect (see [Platforms](#platforms)) |
+| `FILMCRAFT_CLI` | Path of `filmcraft-cli` / `filmcraft-cli.exe` (wins over `FILMCRAFT_DIR`) |
+| `FILMCRAFT_APP` | Path of the desktop app when it lives elsewhere (e.g. a Linux AppImage) |
 | `FILMCRAFT_DATA_DIR` | FilmCraft data folder, for your own export presets |
 | `FILMCRAFT_CONTROL_PORT` | Control port of the desktop app (default 9876) |
 | `FILMCRAFT_MCP_TIMEOUT` | Max seconds per engine command (default 3600) |
@@ -123,9 +147,15 @@ claude mcp add filmcraft -- node "%CD%\dist\bundle.cjs"
 
 ```bash
 npm run build       # TypeScript + single-file bundle (dist/bundle.cjs)
-npm test            # unit tests
+npm test            # unit tests (Windows, macOS and Linux path logic)
 npm run test:e2e    # 21 end-to-end checks over real MCP stdio (FilmCraft's synthetic demo footage)
 npm run pack:mcpb   # filmcraft-mcp-server.mcpb
+```
+
+Linux check in Docker (unpack `filmcraft-<version>-linux-x86_64.tar.gz` first):
+
+```bash
+docker run --rm -v "$PWD:/work:ro" -v "/path/to/filmcraft-0.2.1-linux-x86_64:/opt/filmcraft:ro" -w /work node:22-bookworm bash -c "apt-get update && apt-get install -y libxkbcommon0 libvulkan1 libegl1 mesa-vulkan-drivers libasound2 && node scripts/e2e.mjs"
 ```
 
 ## License

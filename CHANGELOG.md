@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.0] - 2026-10-07
+### Added
+- macOS and Linux support. The installation is found without setup on every OS: Windows (`Program Files`,
+  `%LOCALAPPDATA%\Programs`), Linux deb/rpm (`/usr/bin`), tar.gz (`/opt/filmcraft/bin`, `~/.local/bin`, or
+  `FILMCRAFT_DIR` pointing at the unpacked root), macOS (`/Applications/FilmCraft.app` plus the separate
+  `filmcraft-cli` zip in `/usr/local/bin`, `/opt/homebrew/bin`, `~/bin`...), and `PATH` everywhere.
+- `FILMCRAFT_CLI` and `FILMCRAFT_APP` settings (CLI in a custom place, AppImage desktop app); the extension
+  settings now also offer the `filmcraft-cli` path.
+- `get_filmcraft_status` reports the platform; running-app detection uses `pgrep` on macOS / Linux.
+- README in 9 languages: English, Español, Português, Français, Deutsch, Русский, 简体中文, 日本語, 한국어.
+### Changed
+- Native path handling per OS (case-sensitive file comparison on Linux, POSIX paths passed to the engine unchanged).
+### Verified
+- Windows 11 and Debian 12 (Docker, headless, FilmCraft 0.2.1 tar.gz): 21/21 end-to-end checks each.
+  macOS is supported by the same code paths but not yet tested on a Mac.
+
 ## [1.0.0] - 2026-10-07
 ### Added
 - MCP server on FilmCraft's own headless engine (`filmcraft-cli mcp`), one private engine per job,

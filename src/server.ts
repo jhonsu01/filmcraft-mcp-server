@@ -21,7 +21,7 @@ export function createServer(): McpServer {
     { name: 'filmcraft-mcp-server', version: readPackageVersion() },
     {
       instructions:
-        'Edits video and audio with the engine of the locally installed FilmCraft (Windows), an open-source Premiere-class editor: ' +
+        'Edits video and audio with the engine of the locally installed FilmCraft (Windows, macOS, Linux), an open-source Premiere-class editor: ' +
         'split into N-second pieces, trim, apply video/audio effects, Lumetri color looks and burned-in texts, change speed, join ' +
         'with transitions, convert / export (H.264, ProRes, DNxHR, MXF, GIF, WAV...) and keep edits editable (.fcproj, OTIO, FCPXML, ' +
         'XML, EDL, AAF). All paths must be absolute; files are never overwritten unless overwrite is true. Call get_filmcraft_status ' +

@@ -19,12 +19,17 @@ export function controlPortOpen(port = CONTROL_PORT, timeoutMs = 800): Promise<b
   });
 }
 
-/** filmcraft.exe processes currently running. */
+/** Is the FilmCraft desktop app running? (exact process name: never matches our own filmcraft-cli engines) */
 export function filmcraftRunning(): Promise<boolean> {
   return new Promise((resolve) => {
-    execFile('tasklist', ['/FI', 'IMAGENAME eq filmcraft.exe', '/NH'], { windowsHide: true }, (err, stdout) => {
-      resolve(!err && /filmcraft\.exe/i.test(stdout));
-    });
+    if (process.platform === 'win32') {
+      execFile('tasklist', ['/FI', 'IMAGENAME eq filmcraft.exe', '/NH'], { windowsHide: true }, (err, stdout) => {
+        resolve(!err && /filmcraft\.exe/i.test(stdout));
+      });
+    } else {
+      // pgrep -x matches the process name exactly: "filmcraft" (Linux) or "FilmCraft" (macOS)
+      execFile('pgrep', ['-xi', 'filmcraft'], (err, stdout) => resolve(!err && stdout.trim().length > 0));
+    }
   });
 }
 
@@ -32,7 +37,7 @@ export function filmcraftRunning(): Promise<boolean> {
 export async function ensureLiveApp(port = CONTROL_PORT, waitSec = 45): Promise<{ started: boolean }> {
   if (await controlPortOpen(port)) return { started: false };
   const install = resolveInstall();
-  if (!install.app) throw new Error(`filmcraft.exe not found in ${install.dir}. Set FILMCRAFT_DIR.`);
+  if (!install.app) throw new Error('FilmCraft desktop app not found. Set FILMCRAFT_DIR (or FILMCRAFT_APP for an AppImage).');
   const child = spawn(install.app, ['--control', String(port)], { detached: true, stdio: 'ignore', windowsHide: false });
   child.unref();
   const deadline = Date.now() + waitSec * 1000;
@@ -56,13 +61,13 @@ export async function openInFilmCraft(paths: string[], port = CONTROL_PORT): Pro
     async (s) => {
       for (const p of projects) await s.run('file.open', { path: toEnginePath(p) });
       if (media.length) {
-        const r = await s.run<{ items: number[]; errors: unknown[] }>('file.import', { paths: media.map(toEnginePath) });
+        const r = await s.run<{ items: number[]; errors: unknown[] }>('file.import', { paths: media.map((p) => toEnginePath(p)) });
         opened['imported_items'] = r.items;
         if (r.errors?.length) opened['import_errors'] = r.errors;
         if (r.items?.length) {
           await s.run('project.select', { items: [r.items[0]] });
           await s.run('file.newSequenceFromClip', { items: [r.items[0]] });
-          opened['sequence_from'] = path.win32.basename(media[0]);
+          opened['sequence_from'] = path.basename(media[0]);
         }
       }
     },

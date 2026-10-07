@@ -102,10 +102,10 @@ export function registerTools(server: McpServer): void {
           const stem = stemOf(input);
           const outDir = args.output_dir
             ? args.group_by_input
-              ? path.win32.join(args.output_dir, stem)
+              ? path.join(args.output_dir, stem)
               : args.output_dir
-            : path.win32.join(path.win32.dirname(input), `${stem}_segments`);
-          if (args.output_dir && !path.win32.isAbsolute(args.output_dir)) throw new Error('output_dir must be an absolute path.');
+            : path.join(path.dirname(input), `${stem}_segments`);
+          if (args.output_dir && !path.isAbsolute(args.output_dir)) throw new Error('output_dir must be an absolute path.');
           try {
             const r = await withSession((s) =>
               splitMedia(s, {
@@ -542,12 +542,13 @@ export function registerTools(server: McpServer): void {
       const install = resolveInstall();
       const status: Record<string, unknown> = {
         ready: !!install.cli,
+        platform: `${install.platform} ${process.arch}`,
         install_dir: install.dir,
         cli: install.cli ?? null,
         app: install.app ?? null,
       };
       try {
-        if (!install.cli) throw new Error(`filmcraft-cli.exe not found in ${install.dir}. Install FilmCraft or set FILMCRAFT_DIR.`);
+        if (!install.cli) throw new Error(`filmcraft-cli not found (searched ${install.searched.length} folders). Install FilmCraft or set FILMCRAFT_DIR / FILMCRAFT_CLI.`);
         status['version'] = (await runCli(['--version'])).trim();
         status['app_running'] = await filmcraftRunning();
         status['control_port'] = CONTROL_PORT;

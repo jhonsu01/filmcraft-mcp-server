@@ -15,16 +15,16 @@ import { resolveOutputPath, sameExt, stemOf, toEnginePath } from '../paths.js';
 export function collectInputs(paths: string[], dir?: string): string[] {
   const out: string[] = [];
   for (const p of paths) {
-    if (!path.win32.isAbsolute(p)) throw new Error(`Paths must be absolute: ${p}`);
+    if (!path.isAbsolute(p)) throw new Error(`Paths must be absolute: ${p}`);
     if (!existsSync(p) || !statSync(p).isFile()) throw new Error(`File not found: ${p}`);
     out.push(p);
   }
   if (dir) {
-    if (!path.win32.isAbsolute(dir)) throw new Error(`input_dir must be an absolute path: ${dir}`);
+    if (!path.isAbsolute(dir)) throw new Error(`input_dir must be an absolute path: ${dir}`);
     if (!existsSync(dir) || !statSync(dir).isDirectory()) throw new Error(`Folder not found: ${dir}`);
     for (const name of readdirSync(dir).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))) {
-      const full = path.win32.join(dir, name);
-      const ext = path.win32.extname(name).slice(1).toLowerCase();
+      const full = path.join(dir, name);
+      const ext = path.extname(name).slice(1).toLowerCase();
       if (INPUT_EXTENSIONS.includes(ext) && statSync(full).isFile()) out.push(full);
     }
   }
@@ -132,8 +132,8 @@ export async function selectClips(s: FilmCraftSession, clips: number[]): Promise
  * Headless edits never render previews, so remove those folders when they are empty.
  */
 export function removeEmptyPreviews(projectPath: string): void {
-  const root = path.win32.join(path.win32.dirname(projectPath), 'FilmCraft Previews');
-  const own = path.win32.join(root, stemOf(projectPath));
+  const root = path.join(path.dirname(projectPath), 'FilmCraft Previews');
+  const own = path.join(root, stemOf(projectPath));
   for (const dir of [own, root]) {
     try {
       if (existsSync(dir) && readdirSync(dir).length === 0) rmdirSync(dir);
@@ -154,7 +154,7 @@ export interface OpenedMedia {
 
 /** Import files into the engine's project; returns their item ids (throws on any import error). */
 export async function importMedia(s: FilmCraftSession, inputs: string[]): Promise<number[]> {
-  const r = await s.run<{ items: number[]; errors: unknown[] }>('file.import', { paths: inputs.map(toEnginePath) });
+  const r = await s.run<{ items: number[]; errors: unknown[] }>('file.import', { paths: inputs.map((p) => toEnginePath(p)) });
   if (r.errors?.length) throw new Error(`FilmCraft could not import: ${JSON.stringify(r.errors)}`);
   if (!r.items?.length) throw new Error('FilmCraft imported nothing.');
   return r.items;
@@ -415,7 +415,7 @@ export async function planExport(
     ext = p.extension;
     if (opts.format) params['format'] = opts.format;
   } else {
-    const fromExt = outputPath ? formatFromExtension(path.win32.extname(outputPath)) : undefined;
+    const fromExt = outputPath ? formatFromExtension(path.extname(outputPath)) : undefined;
     const fmt: ExportFormat = opts.format ?? fromExt ?? (hasVideo ? 'h264' : 'wav');
     if (!hasVideo && !AUDIO_ONLY_FORMATS.includes(fmt)) {
       throw new Error(`The source has no picture: export it as wav or aiff, not ${fmt}.`);
@@ -425,7 +425,7 @@ export async function planExport(
     ext = EXPORT_FORMATS[fmt];
   }
   if (outputPath) {
-    const cur = path.win32.extname(outputPath).slice(1);
+    const cur = path.extname(outputPath).slice(1);
     // .mov is a valid container for prores/dnxhr/mjpeg; keep what the caller asked for when compatible
     if (cur && sameExt(cur, ext)) ext = cur.toLowerCase();
   }
@@ -454,7 +454,7 @@ export async function exportActive(
   params: Record<string, unknown>,
   range?: { start: number; end: number },
 ): Promise<ExportResult> {
-  mkdirSync(path.win32.dirname(outPath), { recursive: true });
+  mkdirSync(path.dirname(outPath), { recursive: true });
   const r = await s.run<{ result?: { bytes?: number; frames?: number; seconds?: number; path?: string } }>('file.exportMedia', {
     path: toEnginePath(outPath),
     ...params,
@@ -472,10 +472,10 @@ export async function saveEditable(
   opts: { save_project?: boolean; interchange?: InterchangeFormat[]; overwrite?: boolean },
 ): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
-  const dir = path.win32.dirname(basePath);
+  const dir = path.dirname(basePath);
   const stem = stemOf(basePath);
   const target = (ext: string) => {
-    const r = resolveOutputPath({ inputPath: path.win32.join(dir, `${stem}.__src`), ext, outputDir: dir, overwrite: opts.overwrite });
+    const r = resolveOutputPath({ inputPath: path.join(dir, `${stem}.__src`), ext, outputDir: dir, overwrite: opts.overwrite });
     if ('error' in r) throw new Error(r.error);
     return r.path;
   };
@@ -557,7 +557,7 @@ export async function splitMedia(
   for (let i = 0; i < bounds.length; i++) {
     const name = `${prefix}_${String(i + 1).padStart(digits, '0')}`;
     const r = resolveOutputPath({
-      inputPath: path.win32.join(opts.outputDir, `${name}.__src`),
+      inputPath: path.join(opts.outputDir, `${name}.__src`),
       ext: plan.ext,
       outputDir: opts.outputDir,
       overwrite: opts.output.overwrite,
@@ -571,7 +571,7 @@ export async function splitMedia(
     // the editable version: the source with a cut at every boundary on all tracks
     for (const b of bounds.slice(1)) await s.run('sequence.addEditAllTracks', { time: toTicks(b.start) });
     if (bounds[bounds.length - 1].end < total - 1e-6) await s.run('sequence.addEditAllTracks', { time: toTicks(bounds[bounds.length - 1].end) });
-    editable = await saveEditable(s, path.win32.join(opts.outputDir, `${prefix}_split.__src`), { ...opts.editable, overwrite: opts.output.overwrite });
+    editable = await saveEditable(s, path.join(opts.outputDir, `${prefix}_split.__src`), { ...opts.editable, overwrite: opts.output.overwrite });
   }
   return {
     success: true,

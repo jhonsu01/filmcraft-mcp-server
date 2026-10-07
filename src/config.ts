@@ -1,4 +1,5 @@
 import { existsSync } from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 
 /**
@@ -12,30 +13,96 @@ export function cleanEnv(value: string | undefined): string | undefined {
   return v;
 }
 
-export const DEFAULT_FILMCRAFT_DIR = 'C:\\Program Files\\FilmCraft';
+export type Platform = 'win32' | 'darwin' | 'linux';
+
+export function currentPlatform(): Platform {
+  return process.platform === 'win32' || process.platform === 'darwin' ? process.platform : 'linux';
+}
+
+/** Path helpers of the given platform (lets the tests check every OS from any OS). */
+export function pathFor(platform: Platform): path.PlatformPath {
+  return platform === 'win32' ? path.win32 : path.posix;
+}
 
 export interface FilmCraftInstall {
+  platform: Platform;
+  /** Where we looked first (FILMCRAFT_DIR or the platform default). */
   dir: string;
   cli: string | undefined;
   app: string | undefined;
+  searched: string[];
+}
+
+/** Executable names of the headless CLI and the desktop app. */
+export function exeNames(platform: Platform): { cli: string; app: string[] } {
+  if (platform === 'win32') return { cli: 'filmcraft-cli.exe', app: ['filmcraft.exe'] };
+  // macOS: the app binary inside FilmCraft.app is "FilmCraft"; Linux packages install "filmcraft"
+  return { cli: 'filmcraft-cli', app: platform === 'darwin' ? ['FilmCraft', 'filmcraft'] : ['filmcraft'] };
+}
+
+/** Folders FilmCraft installs into on each OS (the official MSI, DMG, deb/rpm and tar.gz layouts). */
+export function defaultDirs(platform: Platform, env: NodeJS.ProcessEnv, home = os.homedir()): string[] {
+  const p = pathFor(platform);
+  if (platform === 'win32') {
+    const local = env['LOCALAPPDATA'] || p.join(home, 'AppData', 'Local');
+    return [
+      p.join(env['ProgramFiles'] || 'C:\\Program Files', 'FilmCraft'),
+      p.join(env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)', 'FilmCraft'),
+      p.join(local, 'Programs', 'FilmCraft'),
+    ];
+  }
+  if (platform === 'darwin') {
+    return [
+      '/Applications/FilmCraft.app/Contents/MacOS',
+      p.join(home, 'Applications', 'FilmCraft.app', 'Contents', 'MacOS'),
+      '/usr/local/bin',
+      '/opt/homebrew/bin',
+      p.join(home, '.local', 'bin'),
+      p.join(home, 'bin'),
+    ];
+  }
+  return ['/usr/bin', '/usr/local/bin', '/opt/filmcraft/bin', '/opt/filmcraft', p.join(home, '.local', 'bin'), p.join(home, 'bin')];
 }
 
 /**
- * FILMCRAFT_DIR may be the install folder or one of its executables;
- * FILMCRAFT_CLI points straight at filmcraft-cli.exe (wins over FILMCRAFT_DIR).
+ * Find filmcraft-cli and the desktop app.
+ *  - FILMCRAFT_CLI: the CLI executable itself (wins).
+ *  - FILMCRAFT_DIR: install folder, one of its executables, a tar.gz root (with bin/) or FilmCraft.app.
+ *  - FILMCRAFT_APP: the desktop app executable (e.g. an AppImage) when it lives elsewhere.
+ *  - otherwise the platform's default folders, then PATH.
  */
-export function resolveInstall(env: NodeJS.ProcessEnv = process.env, exists: (p: string) => boolean = existsSync): FilmCraftInstall {
-  let dir = cleanEnv(env['FILMCRAFT_DIR']) ?? DEFAULT_FILMCRAFT_DIR;
-  if (/\.exe$/i.test(dir)) dir = path.win32.dirname(dir);
+export function resolveInstall(
+  env: NodeJS.ProcessEnv = process.env,
+  exists: (p: string) => boolean = existsSync,
+  platform: Platform = currentPlatform(),
+  home = os.homedir(),
+): FilmCraftInstall {
+  const p = pathFor(platform);
+  const names = exeNames(platform);
+  const dirs: string[] = [];
+  const fromEnv = cleanEnv(env['FILMCRAFT_DIR']);
+  if (fromEnv) {
+    let d = fromEnv;
+    if (/\.app\/?$/i.test(d)) d = p.join(d, 'Contents', 'MacOS');
+    else if (/\.(exe|appimage)$/i.test(d) || /(^|[\\/])(filmcraft|filmcraft-cli|FilmCraft)$/.test(d)) d = p.dirname(d);
+    dirs.push(d, p.join(d, 'bin'));
+  }
+  dirs.push(...defaultDirs(platform, env, home));
+  const sep = platform === 'win32' ? ';' : ':';
+  for (const d of (env['PATH'] || env['Path'] || '').split(sep)) if (d) dirs.push(d.replace(/"/g, ''));
+  const searched = [...new Set(dirs)];
+
   const cliEnv = cleanEnv(env['FILMCRAFT_CLI']);
-  const cliCandidates = [cliEnv, path.win32.join(dir, 'filmcraft-cli.exe')].filter((p): p is string => !!p);
-  const appCandidates = [path.win32.join(dir, 'filmcraft.exe')];
-  if (cliEnv) appCandidates.push(path.win32.join(path.win32.dirname(cliEnv), 'filmcraft.exe'));
-  return {
-    dir,
-    cli: cliCandidates.find((p) => exists(p)),
-    app: appCandidates.find((p) => exists(p)),
-  };
+  const cli = [cliEnv, ...searched.map((d) => p.join(d, names.cli))].filter((x): x is string => !!x).find((x) => exists(x));
+
+  const appEnv = cleanEnv(env['FILMCRAFT_APP']);
+  const appDirs = [...(cli ? [p.dirname(cli)] : []), ...searched];
+  if (platform === 'darwin') appDirs.unshift('/Applications/FilmCraft.app/Contents/MacOS', p.join(home, 'Applications', 'FilmCraft.app', 'Contents', 'MacOS'));
+  const app = [appEnv, ...appDirs.flatMap((d) => names.app.map((n) => p.join(d, n)))]
+    .filter((x): x is string => !!x)
+    .find((x) => exists(x));
+
+  return { platform, dir: searched[0], cli, app, searched };
 }
 
 /** Optional FilmCraft data directory (user export presets) for the headless engine. */

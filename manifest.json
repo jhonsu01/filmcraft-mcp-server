@@ -1,10 +1,10 @@
 {
   "manifest_version": "0.3",
   "name": "filmcraft-mcp-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "display_name": "FilmCraft Bridge",
-  "description": "Split, trim, edit (effects, color looks, titles, speed, audio), join, convert and export video with the FilmCraft editor installed on Windows, and keep every edit editable. Not affiliated with FilmCraft or Storytold.",
-  "long_description": "FilmCraft Bridge lets Claude edit video with the FilmCraft you already have installed on Windows (tested with 0.2.1), the open-source, Premiere-class editor written in Rust.\n\n- **Split** videos into N-second pieces, frame-accurate, one folder per input.\n- **Edit**: 130 video effects with parameters and keyframes (blur, glow, vignette, RGB split, camera shake, light leaks...), 18 Lumetri color looks, burned-in titles with font, color, outline, background and animation, speed / reverse, 58 audio effects, volume and fades.\n- **Join** clips, stills and audio with 112 transitions.\n- **Convert / export**: H.264 MP4, ProRes, DNxHR, MJPEG, MXF, GIF, PNG/TIFF stills, WAV/AIFF, with 28 presets (YouTube, Vimeo, Social Vertical, broadcast...).\n- **Editable outputs**: the FilmCraft project (.fcproj) plus OpenTimelineIO, FCPXML, Premiere XML, EDL and AAF for other editors.\n- **Preview** any frame, run any of FilmCraft's 666 engine commands, and open results in the FilmCraft app.\n\nThe connector drives FilmCraft's own headless engine (filmcraft-cli). Everything runs locally with no network access; files are never overwritten unless you ask. FilmCraft is an open-source project by Storytold; this connector is not affiliated with or endorsed by them.",
+  "description": "Split, trim, edit (effects, color looks, titles, speed, audio), join, convert and export video with the FilmCraft editor installed on Windows, macOS or Linux, and keep every edit editable. Not affiliated with FilmCraft or Storytold.",
+  "long_description": "FilmCraft Bridge lets Claude edit video with the FilmCraft you already have installed on Windows, macOS or Linux (tested with 0.2.1 on Windows 11 and Debian 12), the open-source, Premiere-class editor written in Rust.\n\n- **Split** videos into N-second pieces, frame-accurate, one folder per input.\n- **Edit**: 130 video effects with parameters and keyframes (blur, glow, vignette, RGB split, camera shake, light leaks...), 18 Lumetri color looks, burned-in titles with font, color, outline, background and animation, speed / reverse, 58 audio effects, volume and fades.\n- **Join** clips, stills and audio with 112 transitions.\n- **Convert / export**: H.264 MP4, ProRes, DNxHR, MJPEG, MXF, GIF, PNG/TIFF stills, WAV/AIFF, with 28 presets (YouTube, Vimeo, Social Vertical, broadcast...).\n- **Editable outputs**: the FilmCraft project (.fcproj) plus OpenTimelineIO, FCPXML, Premiere XML, EDL and AAF for other editors.\n- **Preview** any frame, run any of FilmCraft's 666 engine commands, and open results in the FilmCraft app.\n\nThe connector drives FilmCraft's own headless engine (filmcraft-cli). Everything runs locally with no network access; files are never overwritten unless you ask. FilmCraft is an open-source project by Storytold; this connector is not affiliated with or endorsed by them.",
   "author": {
     "name": "Jhon Supelano",
     "url": "https://github.com/jhonsu01"
@@ -21,9 +21,12 @@
     "entry_point": "dist/bundle.cjs",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/dist/bundle.cjs"],
+      "args": [
+        "${__dirname}/dist/bundle.cjs"
+      ],
       "env": {
         "FILMCRAFT_DIR": "${user_config.filmcraft_dir}",
+        "FILMCRAFT_CLI": "${user_config.filmcraft_cli}",
         "FILMCRAFT_CONTROL_PORT": "${user_config.control_port}"
       }
     }
@@ -32,7 +35,13 @@
     "filmcraft_dir": {
       "type": "directory",
       "title": "FilmCraft folder",
-      "description": "Install folder of FilmCraft (with filmcraft-cli.exe). Leave empty to use C:\\Program Files\\FilmCraft.",
+      "description": "Install folder of FilmCraft (or FilmCraft.app on macOS). Leave empty to auto-detect: C:\\Program Files\\FilmCraft, /Applications/FilmCraft.app, /usr/bin, /opt/filmcraft or PATH.",
+      "required": false
+    },
+    "filmcraft_cli": {
+      "type": "file",
+      "title": "filmcraft-cli executable (optional)",
+      "description": "Only if it is somewhere else, e.g. where you unzipped filmcraft-cli-<version>-macos.zip on macOS.",
       "required": false
     },
     "control_port": {
@@ -43,24 +52,75 @@
     }
   },
   "compatibility": {
-    "platforms": ["win32"],
+    "platforms": [
+      "win32",
+      "darwin",
+      "linux"
+    ],
     "runtimes": {
       "node": ">=20.0.0"
     }
   },
   "tools": [
-    { "name": "split_video", "description": "Cut one or many videos into N-second pieces, one folder per input" },
-    { "name": "edit_video", "description": "Effects, Lumetri color look, titles, speed, audio effects and fades on one or many files" },
-    { "name": "trim_video", "description": "Keep a time range of a file, with optional fades" },
-    { "name": "concat_videos", "description": "Join videos, stills and audio with transitions" },
-    { "name": "convert_media", "description": "Re-export with another codec, size, frame rate, preset, or extract the audio" },
-    { "name": "get_media_info", "description": "Container, duration, codecs, size, frame rate and audio of a file" },
-    { "name": "render_frame", "description": "Render one frame of a file or project to PNG" },
-    { "name": "list_catalog", "description": "Effects, transitions, color looks, export presets and engine commands" },
-    { "name": "run_commands", "description": "Run any FilmCraft engine command, headless or in the live app" },
-    { "name": "open_in_filmcraft", "description": "Open projects or media in the FilmCraft app" },
-    { "name": "get_filmcraft_status", "description": "Check the FilmCraft installation, version and catalog" }
+    {
+      "name": "split_video",
+      "description": "Cut one or many videos into N-second pieces, one folder per input"
+    },
+    {
+      "name": "edit_video",
+      "description": "Effects, Lumetri color look, titles, speed, audio effects and fades on one or many files"
+    },
+    {
+      "name": "trim_video",
+      "description": "Keep a time range of a file, with optional fades"
+    },
+    {
+      "name": "concat_videos",
+      "description": "Join videos, stills and audio with transitions"
+    },
+    {
+      "name": "convert_media",
+      "description": "Re-export with another codec, size, frame rate, preset, or extract the audio"
+    },
+    {
+      "name": "get_media_info",
+      "description": "Container, duration, codecs, size, frame rate and audio of a file"
+    },
+    {
+      "name": "render_frame",
+      "description": "Render one frame of a file or project to PNG"
+    },
+    {
+      "name": "list_catalog",
+      "description": "Effects, transitions, color looks, export presets and engine commands"
+    },
+    {
+      "name": "run_commands",
+      "description": "Run any FilmCraft engine command, headless or in the live app"
+    },
+    {
+      "name": "open_in_filmcraft",
+      "description": "Open projects or media in the FilmCraft app"
+    },
+    {
+      "name": "get_filmcraft_status",
+      "description": "Check the FilmCraft installation, version and catalog"
+    }
   ],
-  "keywords": ["filmcraft", "video", "video-editing", "split", "trim", "effects", "color", "titles", "transitions", "export", "windows"],
+  "keywords": [
+    "filmcraft",
+    "video",
+    "video-editing",
+    "split",
+    "trim",
+    "effects",
+    "color",
+    "titles",
+    "transitions",
+    "export",
+    "windows",
+    "macos",
+    "linux"
+  ],
   "license": "Apache-2.0"
 }
