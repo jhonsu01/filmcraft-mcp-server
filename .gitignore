@@ -1,0 +1,31 @@
+node_modules/
+dist/
+*.mcpb
+.tmp/
+*.tsbuildinfo
+.env
+.env.*
+.codegraph/
+
+# Personal media: never publish anything from this folder
+demotest/
+
+# Media and FilmCraft render caches
+FilmCraft Previews/
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.avi
+*.mxf
+*.gif
+*.wav
+*.mp3
+*.flac
+*.aif
+*.aiff
+*.fcproj
+*.otio
+*.fcpxml
+*.edl
+*.aaf

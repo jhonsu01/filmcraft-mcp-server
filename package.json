@@ -1,0 +1,55 @@
+{
+  "name": "filmcraft-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for FilmCraft: split, trim, edit (effects, Lumetri looks, titles, speed, audio), join, convert and export video with FilmCraft's own engine, from Claude (Windows).",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "filmcraft-mcp-server": "dist/index.js"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc && node scripts/bundle.mjs",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:e2e": "node scripts/e2e.mjs",
+    "pack:mcpb": "npm run build && npx -y @anthropic-ai/mcpb pack . filmcraft-mcp-server.mcpb"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "filmcraft",
+    "video",
+    "video-editing",
+    "split-video",
+    "effects",
+    "lumetri",
+    "titles",
+    "ffmpeg-free",
+    "windows"
+  ],
+  "author": "Jhon Supelano (https://github.com/jhonsu01)",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhonsu01/filmcraft-mcp-server.git"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "os": [
+    "win32"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.3"
+  }
+}
