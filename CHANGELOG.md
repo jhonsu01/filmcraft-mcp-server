@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.1] - 2026-10-09
+### Fixed
+- `edit_video` texts `position` is now declared as an array of 2 numbers instead of a JSON Schema tuple (`"items": [...]`). The Z.ai / GLM API (ZCode, Sunsam Code) rejected every request that included this tool with error `[1210] Invalid API parameter`, so no message could be sent while FilmCraft Bridge was enabled.
+
 ## [1.1.0] - 2026-10-07
 ### Added
 - macOS and Linux support. The installation is found without setup on every OS: Windows (`Program Files`,

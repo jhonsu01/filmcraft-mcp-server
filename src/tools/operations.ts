@@ -261,7 +261,9 @@ export const textSchema = z.object({
     .enum(['top', 'center', 'bottom', 'top_left', 'top_right', 'bottom_left', 'bottom_right'])
     .default('bottom')
     .describe('Where to put it (ignored when position is given).'),
-  position: z.tuple([z.number(), z.number()]).optional().describe('Exact [x, y] in frame pixels of the text origin (alignment point on the first baseline).'),
+  // Array of exactly 2 numbers, NOT z.tuple: tuples become `"items": [..]` (draft-07 tuple form),
+  // which the Z.ai / GLM API rejects with error 1210 "Invalid API parameter" for the whole request.
+  position: z.array(z.number()).length(2).optional().describe('Exact [x, y] in frame pixels of the text origin (alignment point on the first baseline).'),
   size: z.number().positive().default(90).describe('Font size in pixels.'),
   font: z.string().optional().describe('Font family, e.g. "Inter", "Arial".'),
   font_style: z.string().optional().describe('e.g. "Bold", "Italic".'),
