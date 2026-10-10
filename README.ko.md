@@ -105,6 +105,14 @@
 2. 더블 클릭하거나 Claude Desktop → *설정 → 확장 프로그램*으로 끌어다 놓고 **설치**를 누릅니다.
 3. 선택: FilmCraft가 표준 위치에 없다면 확장 프로그램 설정에서 폴더나 `filmcraft-cli` 경로를 지정합니다.
 
+### Codex (OpenAI)
+
+**권장 — 마켓플레이스(업데이트 받음):** *플러그인 → 추가 → 마켓플레이스 추가*에서 소스 `jhonsu01/craft-marketplace`, 참조 `main`을 지정한 뒤 **Craft Bridges**에서 **FilmCraft Bridge**를 설치합니다([craft-marketplace](https://github.com/jhonsu01/craft-marketplace)). 마켓플레이스를 새로 고치면 새 버전이 설치됩니다. 또는 zip을 업로드합니다(Codex는 계정에 저장하고 같은 이름의 새 zip은 거부합니다):
+
+1. [최신 릴리스](https://github.com/jhonsu01/filmcraft-mcp-server/releases/latest)에서 `filmcraft-mcp-server-<버전>-codex.zip`을 내려받습니다.
+2. Codex에서 *플러그인 → 추가 → 새 플러그인*을 열고 zip을 선택한 뒤 **플러그인 추가**를 누릅니다.
+3. Codex는 `node`로 서버를 시작하므로 `PATH`에 Node.js ≥ 20이 있어야 합니다. FilmCraft가 표준 위치에 없다면 `FILMCRAFT_DIR` 또는 `FILMCRAFT_CLI`를 시스템 환경 변수로 설정하세요(Codex에는 로컬 플러그인용 설정 화면이 없습니다).
+
 ### Claude Code / 기타 MCP 클라이언트
 
 ```bash
@@ -150,6 +158,7 @@ npm run build       # TypeScript + 단일 파일 번들(dist/bundle.cjs)
 npm test            # 단위 테스트(Windows, macOS, Linux 경로 처리)
 npm run test:e2e    # 실제 MCP stdio를 통한 21개 엔드투엔드 검사(FilmCraft 내장 합성 데모 영상 사용)
 npm run pack:mcpb   # filmcraft-mcp-server.mcpb
+npm run pack:codex  # Codex 플러그인 zip
 ```
 
 Docker에서 Linux 검증(먼저 `filmcraft-<버전>-linux-x86_64.tar.gz`를 풀어 두세요):

@@ -1,6 +1,6 @@
 {
   "name": "filmcraft-mcp-server",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "MCP server for FilmCraft: split, trim, edit (effects, Lumetri looks, titles, speed, audio), join, convert and export video with FilmCraft's own engine, from Claude (Windows, macOS, Linux).",
   "type": "module",
   "main": "dist/index.js",
@@ -15,7 +15,8 @@
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:e2e": "node scripts/e2e.mjs",
-    "pack:mcpb": "npm run build && npx -y @anthropic-ai/mcpb pack . filmcraft-mcp-server.mcpb"
+    "pack:mcpb": "npm run build && npx -y @anthropic-ai/mcpb pack . filmcraft-mcp-server.mcpb",
+    "pack:codex": "npm run build && node scripts/pack-codex.mjs"
   },
   "keywords": [
     "mcp",
@@ -55,5 +56,15 @@
     "esbuild": "^0.28.2",
     "typescript": "^5.9.3",
     "vitest": "^5.0.3"
+  },
+  "codex": {
+    "shortDescription": "Edit, trim, join and convert videos with your local FilmCraft",
+    "category": "Design",
+    "brandColor": "#EA580C",
+    "defaultPrompt": [
+      "Split this video into 30-second clips",
+      "Join these clips with crossfades and export MP4",
+      "Add a title and a warm color look to this video"
+    ]
   }
 }

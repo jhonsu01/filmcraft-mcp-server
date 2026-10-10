@@ -105,6 +105,14 @@
 2. Дважды щёлкните по нему (или перетащите в Claude Desktop → *Настройки → Расширения*) и нажмите **Установить**.
 3. Необязательно: если FilmCraft установлен не в стандартное место, укажите его папку или путь к `filmcraft-cli` в настройках расширения.
 
+### Codex (OpenAI)
+
+**Рекомендуется — маркетплейс (получает обновления):** *Плагины → Добавить → Добавить маркетплейс*, источник `jhonsu01/craft-marketplace`, ссылка `main`, затем установите **FilmCraft Bridge** из **Craft Bridges** ([craft-marketplace](https://github.com/jhonsu01/craft-marketplace)). Новые версии приходят при обновлении маркетплейса. Или загрузите zip (Codex сохранит его в вашей учётной записи и отклонит более новый zip с тем же именем):
+
+1. Скачайте `filmcraft-mcp-server-<версия>-codex.zip` из [последнего релиза](https://github.com/jhonsu01/filmcraft-mcp-server/releases/latest).
+2. В Codex: *Плагины → Добавить → Новый плагин*, выберите zip и нажмите **Добавить плагин**.
+3. Codex запускает сервер через `node`, поэтому Node.js ≥ 20 должен быть в `PATH`. Если FilmCraft установлен не в стандартное место, задайте `FILMCRAFT_DIR` или `FILMCRAFT_CLI` как системные переменные окружения (у Codex нет формы настроек для локальных плагинов).
+
 ### Claude Code / другие MCP-клиенты
 
 ```bash
@@ -150,6 +158,7 @@ npm run build       # TypeScript + бандл в один файл (dist/bundle.
 npm test            # модульные тесты (логика путей Windows, macOS и Linux)
 npm run test:e2e    # 21 сквозная проверка через реальный MCP stdio (синтетическое демо-видео FilmCraft)
 npm run pack:mcpb   # filmcraft-mcp-server.mcpb
+npm run pack:codex  # zip-плагин для Codex
 ```
 
 Проверка Linux в Docker (сначала распакуйте `filmcraft-<версия>-linux-x86_64.tar.gz`):

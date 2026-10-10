@@ -1,7 +1,7 @@
 {
   "manifest_version": "0.3",
   "name": "filmcraft-mcp-server",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "display_name": "FilmCraft Bridge",
   "description": "Split, trim, edit (effects, color looks, titles, speed, audio), join, convert and export video with the FilmCraft editor installed on Windows, macOS or Linux, and keep every edit editable. Not affiliated with FilmCraft or Storytold.",
   "long_description": "FilmCraft Bridge lets Claude edit video with the FilmCraft you already have installed on Windows, macOS or Linux (tested with 0.2.1 on Windows 11 and Debian 12), the open-source, Premiere-class editor written in Rust.\n\n- **Split** videos into N-second pieces, frame-accurate, one folder per input.\n- **Edit**: 130 video effects with parameters and keyframes (blur, glow, vignette, RGB split, camera shake, light leaks...), 18 Lumetri color looks, burned-in titles with font, color, outline, background and animation, speed / reverse, 58 audio effects, volume and fades.\n- **Join** clips, stills and audio with 112 transitions.\n- **Convert / export**: H.264 MP4, ProRes, DNxHR, MJPEG, MXF, GIF, PNG/TIFF stills, WAV/AIFF, with 28 presets (YouTube, Vimeo, Social Vertical, broadcast...).\n- **Editable outputs**: the FilmCraft project (.fcproj) plus OpenTimelineIO, FCPXML, Premiere XML, EDL and AAF for other editors.\n- **Preview** any frame, run any of FilmCraft's 666 engine commands, and open results in the FilmCraft app.\n\nThe connector drives FilmCraft's own headless engine (filmcraft-cli). Everything runs locally with no network access; files are never overwritten unless you ask. FilmCraft is an open-source project by Storytold; this connector is not affiliated with or endorsed by them.",

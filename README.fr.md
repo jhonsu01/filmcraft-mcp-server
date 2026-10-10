@@ -105,6 +105,14 @@ Téléchargements : [versions de FilmCraft](https://github.com/storytold/filmcra
 2. Double-cliquez dessus (ou glissez-le dans Claude Desktop → *Paramètres → Extensions*) puis cliquez sur **Installer**.
 3. Optionnel : si FilmCraft n'est pas à un emplacement standard, indiquez son dossier ou le chemin de `filmcraft-cli` dans les réglages de l'extension.
 
+### Codex (OpenAI)
+
+**Recommandé — le marketplace (reçoit les mises à jour) :** *Plugins → Ajouter → Ajouter un marketplace*, source `jhonsu01/craft-marketplace`, référence `main`, puis installez **FilmCraft Bridge** depuis **Craft Bridges** ([craft-marketplace](https://github.com/jhonsu01/craft-marketplace)). Les nouvelles versions arrivent en actualisant le marketplace. Ou envoyez le zip (Codex le garde dans votre compte et refuse un zip plus récent portant le même nom) :
+
+1. Téléchargez `filmcraft-mcp-server-<version>-codex.zip` depuis la [dernière version](https://github.com/jhonsu01/filmcraft-mcp-server/releases/latest).
+2. Dans Codex : *Plugins → Ajouter → Nouveau plugin*, choisissez le zip et cliquez sur **Ajouter le plugin**.
+3. Codex lance le serveur avec `node` : Node.js ≥ 20 doit donc être dans le `PATH`. Si FilmCraft n'est pas à un emplacement standard, définissez `FILMCRAFT_DIR` ou `FILMCRAFT_CLI` comme variables d'environnement système (Codex n'a pas de formulaire de paramètres pour les plugins locaux).
+
 ### Claude Code / autres clients MCP
 
 ```bash
@@ -150,6 +158,7 @@ npm run build       # TypeScript + bundle en un seul fichier (dist/bundle.cjs)
 npm test            # tests unitaires (logique de chemins Windows, macOS et Linux)
 npm run test:e2e    # 21 tests de bout en bout via MCP stdio réel (images de démonstration synthétiques de FilmCraft)
 npm run pack:mcpb   # filmcraft-mcp-server.mcpb
+npm run pack:codex  # zip de plugin pour Codex
 ```
 
 Test Linux dans Docker (décompressez d'abord `filmcraft-<version>-linux-x86_64.tar.gz`) :
