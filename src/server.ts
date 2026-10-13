@@ -3,6 +3,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerTools } from './tools/register.js';
+import { LINK_INSTRUCTIONS } from './links.js';
 
 /** serverInfo.version comes from package.json (reachable as ../package.json from dist/ and src/). */
 export function readPackageVersion(): string {
@@ -26,7 +27,9 @@ export function createServer(): McpServer {
         'with transitions, convert / export (H.264, ProRes, DNxHR, MXF, GIF, WAV...) and keep edits editable (.fcproj, OTIO, FCPXML, ' +
         'XML, EDL, AAF). All paths must be absolute; files are never overwritten unless overwrite is true. Call get_filmcraft_status ' +
         'first if unsure FilmCraft is installed, list_catalog for effect ids and parameters, render_frame to preview, ' +
-        'run_commands for any of the 666 engine commands, open_in_filmcraft to continue in the app.',
+        'run_commands for any of the 666 engine commands, open_in_filmcraft to continue in the app.' +
+        ' ' +
+        LINK_INSTRUCTIONS,
     },
   );
   registerTools(server);

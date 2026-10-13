@@ -7,6 +7,7 @@ import { runCli, withSession } from '../engine.js';
 import { EXPORT_FORMATS, INPUT_EXTENSIONS, INTERCHANGE_FORMAT_IDS, TICKS_PER_SECOND, toSeconds } from '../formats.js';
 import { resolveOutputPath, stemOf, toEnginePath } from '../paths.js';
 import { controlPortOpen, filmcraftRunning, openInFilmCraft } from './app.js';
+import { withFileLinks } from '../links.js';
 import {
   EditSpec, ExportOptions, audioEffectHint, buildConcat, buildEdit, collectInputs, editableOptionsSchema, effectSchema,
   exportActive, exportOptionsSchema, exportPresets, importMedia, inspectSequence, openMedia, pieceSchema, planExport,
@@ -17,7 +18,7 @@ type Content = { type: 'text'; text: string } | { type: 'image'; data: string; m
 type ToolResult = { content: Content[]; isError?: boolean };
 
 function json(obj: unknown, isError = false): ToolResult {
-  const out: ToolResult = { content: [{ type: 'text', text: JSON.stringify(obj, null, 2) }] };
+  const out: ToolResult = { content: [{ type: 'text', text: JSON.stringify(withFileLinks(obj), null, 2) }] };
   if (isError) out.isError = true;
   return out;
 }
@@ -373,7 +374,7 @@ export function registerTools(server: McpServer): void {
         writeFileSync(out.path, Buffer.from(image.data!, 'base64'));
         return {
           content: [
-            { type: 'text', text: JSON.stringify({ success: true, input, seconds: args.seconds, output: out.path }, null, 2) },
+            { type: 'text', text: JSON.stringify(withFileLinks({ success: true, input, seconds: args.seconds, output: out.path }), null, 2) },
             { type: 'image', data: image.data!, mimeType: image.mimeType ?? 'image/png' },
           ],
         };

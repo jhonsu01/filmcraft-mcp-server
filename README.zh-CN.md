@@ -156,7 +156,7 @@ claude mcp add filmcraft -- node "$PWD/dist/bundle.cjs"
 ```bash
 npm run build       # TypeScript + 单文件打包（dist/bundle.cjs）
 npm test            # 单元测试（Windows、macOS、Linux 路径逻辑）
-npm run test:e2e    # 通过真实 MCP stdio 的 21 项端到端检查（使用 FilmCraft 自带的合成演示素材）
+npm run test:e2e    # 通过真实 MCP stdio 的 22 项端到端检查（使用 FilmCraft 自带的合成演示素材）
 npm run pack:mcpb   # filmcraft-mcp-server.mcpb
 npm run pack:codex  # Codex 插件 zip
 ```

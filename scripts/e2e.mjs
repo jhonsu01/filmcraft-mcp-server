@@ -7,6 +7,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, statSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { fileURLToPath } from 'url';
 
 const out = mkdtempSync(join(tmpdir(), 'fc-e2e-'));
 const src = join(out, 'Vídeo ñandú');
@@ -18,9 +19,11 @@ await client.connect(new StdioClientTransport({ command: process.execPath, args:
 let failed = 0;
 const check = (cond, msg) => { console.log(`${cond ? 'PASS' : 'FAIL'}  ${msg}`); if (!cond) failed++; };
 const parse = (res) => JSON.parse(res.content.find((c) => c.type === 'text').text);
+const LINKED = [];
 const call = async (name, args) => {
   const res = await client.callTool({ name, arguments: args });
   const body = parse(res);
+  if (body && body.files_markdown) LINKED.push(body.files_markdown);
   if (res.isError) console.log('      ', JSON.stringify(body).slice(0, 400));
   return { ...body, _raw: res };
 };
@@ -110,6 +113,10 @@ check(frameProj.success, `render_frame from .fcproj: ${frameProj.output}`);
 
 const dirFiles = readdirSync(join(out, 'split', 'aurora'));
 check(dirFiles.every((f) => statSync(join(out, 'split', 'aurora', f)).size > 0), `split folder: ${dirFiles.join(', ')}`);
+
+// every result that names output files carries working links to them
+const linkUrls = LINKED.flatMap((m) => [...m.matchAll(/\]\((file:\/\/\/[^)]+)\)/g)].map((x) => x[1]));
+check(linkUrls.length > 0 && linkUrls.every((u) => !/[ ()]/.test(u) && existsSync(fileURLToPath(u))), `files_markdown: ${linkUrls.length} file:/// links in ${LINKED.length} results, all valid and existing`);
 
 await client.close();
 console.log(`\n${failed ? `${failed} FAILED` : 'ALL PASSED'} in ${((Date.now() - t0) / 1000).toFixed(1)} s · output in ${out}`);

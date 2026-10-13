@@ -156,7 +156,7 @@ claude mcp add filmcraft -- node "$PWD/dist/bundle.cjs"
 ```bash
 npm run build       # TypeScript + 単一ファイルバンドル（dist/bundle.cjs）
 npm test            # 単体テスト（Windows・macOS・Linux のパス処理）
-npm run test:e2e    # 実際の MCP stdio を通した 21 項目のエンドツーエンド検証（FilmCraft 付属の合成デモ映像を使用）
+npm run test:e2e    # 実際の MCP stdio を通した 22 項目のエンドツーエンド検証（FilmCraft 付属の合成デモ映像を使用）
 npm run pack:mcpb   # filmcraft-mcp-server.mcpb
 npm run pack:codex  # Codex 用プラグイン zip
 ```
