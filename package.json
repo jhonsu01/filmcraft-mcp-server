@@ -1,6 +1,6 @@
 {
   "name": "filmcraft-mcp-server",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "MCP server for FilmCraft: split, trim, edit (effects, Lumetri looks, titles, speed, audio), join, convert and export video with FilmCraft's own engine, from Claude (Windows, macOS, Linux).",
   "type": "module",
   "main": "dist/index.js",

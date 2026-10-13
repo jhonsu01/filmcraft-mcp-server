@@ -113,6 +113,12 @@ Descargas: [versiones de FilmCraft](https://github.com/storytold/filmcraft/relea
 2. En Codex: *Complementos → Añadir → Nuevo complemento*, elige el zip y pulsa **Añadir complemento**.
 3. Codex arranca el servidor con `node`, así que Node.js ≥ 20 debe estar en el `PATH`. Si FilmCraft no está en una ubicación estándar, define `FILMCRAFT_DIR` o `FILMCRAFT_CLI` como variables de entorno del sistema (Codex no tiene formulario de configuración para complementos locales).
 
+### DeepSeek Harness
+
+1. *Plugins → Add plugin*, escribe `github:jhonsu01/craft-marketplace#path:/plugins/filmcraft-mcp-server` y pulsa **Install** y luego **Enable now**.
+2. Harness arranca el servidor con su propio cliente MCP y `node` (Node.js ≥ 20 en el `PATH`); las herramientas aparecen como `mcp__filmcraft__<herramienta>` y los archivos de salida como tarjetas que se abren en Harness.
+3. Harness aún no actualiza los plugins por sí solo: para actualizar, desinstala el plugin y vuelve a instalarlo con la misma dirección.
+
 ### Claude Code / otros clientes MCP
 
 ```bash
